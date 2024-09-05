@@ -1,40 +1,63 @@
-// Función para ingresar los ingresos mensuales del usuario
+function validarIngreso(ingreso) {
+    return !isNaN(ingreso) && ingreso >= 0;
+}
+
+
 function ingresarIngresos() {
-    let ingresos = prompt("Ingresa tu ingreso mensual total:");
-    return parseFloat(ingresos);
+    let ingresos;
+    do {
+        ingresos = parseFloat(prompt("Ingresa tu ingreso mensual total:"));
+    } while (!validarIngreso(ingresos));
+    return ingresos;
 }
 
-// Función para asignar el presupuesto a diferentes categorías
+
 function asignarPresupuesto(ingresos) {
-    let vivienda = prompt(`Asigna cuánto quieres gastar en vivienda (Total ingresos: $${ingresos}):`);
-    let alimentacion = prompt("Asigna cuánto quieres gastar en alimentación:");
-    let transporte = prompt("Asigna cuánto quieres gastar en transporte:");
-    return { 
-        vivienda: parseFloat(vivienda), 
-        alimentacion: parseFloat(alimentacion), 
-        transporte: parseFloat(transporte) 
-    };
+    const categorias = ['vivienda', 'alimentacion', 'transporte', 'entretenimiento', 'salud'];
+    const presupuesto = {};
+
+    categorias.forEach(categoria => {
+        let gasto;
+        do {
+            gasto = parseFloat(prompt(`Asigna cuánto quieres gastar en ${categoria} (Total ingresos: $${ingresos}):`));
+        } while (!validarIngreso(gasto));
+        presupuesto[categoria] = gasto;
+    });
+
+    return presupuesto;
 }
 
-// Función para calcular los ahorros
+
 function calcularAhorros(ingresos, presupuesto) {
-    let gastosTotales = presupuesto.vivienda + presupuesto.alimentacion + presupuesto.transporte;
+    const gastosTotales = Object.values(presupuesto).reduce((total, gasto) => total + gasto, 0);
     let ahorros = ingresos - gastosTotales;
-    return ahorros;
+    return { ahorros, gastosTotales };
 }
 
-// Función para mostrar un resumen financiero
-function mostrarResumen(ingresos, presupuesto, ahorros) {
-    alert(`Resumen Financiero:\nIngresos: $${ingresos}\nGastos Totales: $${presupuesto.vivienda + presupuesto.alimentacion + presupuesto.transporte}\nAhorros: $${ahorros}`);
+
+function sugerirAjustes(ahorros, presupuesto) {
+    if (ahorros < 0) {
+        alert("¡Cuidado! Estás gastando más de lo que ingresas.");
+        console.log("Sugerencias para reducir gastos:");
+        for (let categoria in presupuesto) {
+            console.log(`Considera reducir los gastos en ${categoria}.`);
+        }
+    }
 }
 
-// Ejecución del simulador
+
+function mostrarResumen(ingresos, presupuesto, ahorros, gastosTotales) {
+    alert(`Resumen Financiero:\nIngresos: $${ingresos}\nGastos Totales: $${gastosTotales}\nAhorros: $${ahorros}`);
+}
+
+
 function simuladorFinanciero() {
-    let ingresos = ingresarIngresos(); // Paso 1: Ingresar ingresos
-    let presupuesto = asignarPresupuesto(ingresos); // Paso 2: Asignar presupuesto
-    let ahorros = calcularAhorros(ingresos, presupuesto); // Paso 3: Calcular ahorros
-    mostrarResumen(ingresos, presupuesto, ahorros); // Paso 4: Mostrar resumen
+    let ingresos = ingresarIngresos(); 
+    let presupuesto = asignarPresupuesto(ingresos); 
+    let { ahorros, gastosTotales } = calcularAhorros(ingresos, presupuesto); 
+    sugerirAjustes(ahorros, presupuesto); 
+    mostrarResumen(ingresos, presupuesto, ahorros, gastosTotales); 
 }
 
-// Llamada para iniciar el simulador financiero
+
 simuladorFinanciero();
